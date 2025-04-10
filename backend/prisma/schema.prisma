@@ -15,5 +15,35 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id       Int       @id @default(autoincrement())
+  username String    @unique
+  password String
+  name     String
+  email    String
+  stream   Streams[]
+  upvote   Upvotes[]
+}
+
+model Streams {
+  id     Int        @id @default(autoincrement())
+  type   StreamType
+  active Boolean    @default(true)
+  userId Int
+  user   User       @relation(fields: [userId], references: [id])
+  upvote Upvotes[]
+}
+
+model Upvotes {
+  id       Int     @id @default(autoincrement())
+  userId   Int
+  streamId Int
+  user     User    @relation(fields: [userId], references: [id])
+  stream   Streams @relation(fields: [streamId], references: [id])
+
+  @@unique([userId, streamId])
+}
+
+enum StreamType {
+  Spotify
+  Youtube
 }
