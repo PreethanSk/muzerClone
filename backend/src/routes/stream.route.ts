@@ -15,48 +15,6 @@ const SPOTIFY_URL_REGEX = /^(https?:\/\/)?(open\.spotify\.com\/(track|album|play
 app.use(express.json());
 app.use(cors())
 
-// streamRouter.post("/createStream",userMiddleware, async(req,res) => {
-//     try{
-//         // inputs
-//         //@ts-ignore
-//         const userId = req.id
-//         const { url, active} = req.body;
-//
-//         const zodParse = CreateStreamSchema.safeParse(req.body);
-//         const isYt = YT_REGEX.test(url);
-//         const isSpotify = SPOTIFY_URL_REGEX.test(url);
-//         let streamType: StreamingType | null = null;
-//         if(!isYt || !isSpotify){
-//             res.status(403).json({message:'this link is not valid'});
-//             return
-//         }
-//         if(!zodParse.success){
-//             res.status(403).json({message:"zod error"});
-//             return
-//         }
-//         let extractedId = null;
-//         if(isYt){
-//             const ytMatch = url.match("/(?:v=|youtu\\.be\\/)([\\w\\-]+)/");
-//             extractedId = ytMatch ? ytMatch[1] : null;
-//             streamType = "Youtube";
-//
-//         }
-//         else if(isSpotify){
-//             const spotifyMatch = url.match("/(?:track|album|playlist|artist)[\\/:]([\\w\\-]+)/");
-//             extractedId = spotifyMatch ? spotifyMatch[1] : null
-//             streamType = "Spotify";
-//         }
-//         if (!extractedId || !streamType) {
-//             res.status(403).json({ message: "Unable to extract ID or determine stream type from the URL" });
-//             return;
-//         }
-//         await client.streams.create({data: {userId: userId, url: url, type:streamType,extractedId: extractedId,active  }})
-//     }
-//     catch(error){
-//         console.log(error);
-//         res.status(500).json({message:"server crash in createStream endpoing"})
-//     }
-// })
 
 streamRouter.post("/createStream", userMiddleware, async (req, res) => {
     try {
@@ -114,6 +72,22 @@ streamRouter.post("/createStream", userMiddleware, async (req, res) => {
         res.status(500).json({ message: "Server crash in createStream endpoint" });
     }
 });
+
+streamRouter.get("/getStreams/:userId", async(req,res) => {
+    try{
+        const userId = parseInt(req.params.userId)
+        const streams = await client.streams.findMany({
+            where:{
+                userId
+            }
+        })
+        res.json({stream: streams})
+    }
+    catch(error){
+        res.status(500).json({message:"sever crash in getStream endpoint"});
+        console.log(error)
+    }
+})
 
 
 export default streamRouter
