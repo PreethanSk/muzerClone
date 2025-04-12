@@ -25,12 +25,14 @@ model User {
 }
 
 model Streams {
-  id     Int        @id @default(autoincrement())
-  type   StreamType
-  active Boolean    @default(true)
-  userId Int
-  user   User       @relation(fields: [userId], references: [id])
-  upvote Upvotes[]
+  id          Int        @id @default(autoincrement())
+  type        StreamType
+  url         String
+  extractedId String
+  active      Boolean    @default(true)
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  upvote      Upvotes[]
 }
 
 model Upvotes {
@@ -46,4 +48,5 @@ model Upvotes {
 enum StreamType {
   Spotify
   Youtube
+  Null
 }
